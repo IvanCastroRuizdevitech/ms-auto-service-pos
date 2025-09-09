@@ -3,6 +3,7 @@ package container
 import (
 	aplication_services_configuracion "genexis/pos/autoservicios/aplication/services/configuracion"
 	aplication_usecases_configuracion "genexis/pos/autoservicios/aplication/usecases/configuracion"
+	infraestructura_repos_comunes "genexis/pos/autoservicios/infraestructure/db/repositories/comunes"
 	infraestructura_repos_configuracion "genexis/pos/autoservicios/infraestructure/db/repositories/configuracion"
 
 	aplication_services_example "genexis/pos/autoservicios/aplication/services/example"
@@ -74,6 +75,9 @@ func InitializeContainer() error {
 	GetConfiguracionRepository := &infraestructura_repos_configuracion.ConfiguracionInicialRepository{
 		Client: clientDB,
 	}
+	RecuperarWatcherParametrosRepo := &infraestructura_repos_comunes.RecuperarParametrosPos{
+		Client: clientDB,
+	}
 
 	// USE CASES
 	GetExampleUseCase = &aplication_usecases_example.GetExampleUseCase{
@@ -88,8 +92,9 @@ func InitializeContainer() error {
 		GetExampleUseCase: GetExampleUseCase,
 	}
 	GetConfiguracionInicialService = &aplication_services_configuracion.GetConfiguracionInicialService{
-		UseCase:    GetConfiguracionUseCase,
-		HTTPClient: clientHttp,
+		UseCase:       GetConfiguracionUseCase,
+		HTTPClient:    clientHttp,
+		ParametroRepo: RecuperarWatcherParametrosRepo,
 	}
 
 	return nil

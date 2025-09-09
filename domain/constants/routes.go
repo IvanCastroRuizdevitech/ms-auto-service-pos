@@ -1,7 +1,7 @@
 package constants
 
 const (
-	API_PATH string = "/api/v1/sat"
+	API_PATH string = "/api/v1/"
 
 	API_EXAMPLE = "/example"
 
