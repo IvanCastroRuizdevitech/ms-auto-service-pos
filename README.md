@@ -1,3 +1,6 @@
+# ms-auto-service-pos
+Servicio encargado de Gestionar los procesos del POS de Autoservicios.
+
 # Para renderizado automatico en dev
 - go install github.com/air-verse/air@latest
 - air init

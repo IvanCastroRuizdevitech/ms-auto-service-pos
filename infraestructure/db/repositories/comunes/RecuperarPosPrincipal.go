@@ -1,8 +1,8 @@
 package infrastructura_repositorios
 
 import (
-	comunes_entidades "genexis/pos/autoservicios/domain/entities/entidades_comunes"
 	domain_adapters_clients_db "genexis/pos/autoservicios/domain/adapters/clients/db"
+	comunes_entidades "genexis/pos/autoservicios/domain/entities/entidades_comunes"
 	"log"
 	"strings"
 )
