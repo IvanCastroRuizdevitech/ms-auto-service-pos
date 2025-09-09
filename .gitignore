@@ -1,0 +1,12 @@
+/*.bin
+*.bin
+
+
+/ms-*
+
+
+/.env
+.env
+
+
+/tmp
