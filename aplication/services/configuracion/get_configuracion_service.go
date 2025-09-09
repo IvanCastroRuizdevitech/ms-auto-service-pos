@@ -8,6 +8,8 @@ import (
 	infrastructura_repositorios "genexis/pos/autoservicios/infraestructure/db/repositories/comunes"
 	"encoding/json"
 	"errors"
+	"genexis/pos/autoservicios/domain/constants"
+	"log"
 )
 
 type GetConfiguracionInicialService struct {
@@ -30,15 +32,40 @@ func (s *GetConfiguracionInicialService) Execute() (*comunes_entidades.Configura
 	if autoservicioPOS != nil && autoservicioPOS.Valor == "S" {
 		if autoservicioMaestro != nil && autoservicioMaestro.Valor == "S" {
 			// SI “AUTOSERVICIO_MAESTRO” es “S” hacer una petición a la base de datos
-			// TODO: Implementar la llamada a la función almacenada para obtener datos de surtidores, productos, etc.
-			// Por ahora, se devuelve un error o una respuesta de ejemplo.
-			return nil, errors.New("Funcionalidad de base de datos para AUTOSERVICIO_MAESTRO = S pendiente de implementar")
+			// Llamada a la función almacenada fnc_obtener_configuracion_pos_autoservicio
+			query := "SELECT * FROM public.fnc_obtener_configuracion_pos_autoservicio($1)"
+			// Se pasa un JSON vacío como parámetro ya que la función almacenada no lo utiliza actualmente
+			args := []interface{}{"{}"}
+
+			result, err := s.ParametroRepo.Client.Select(query, args)
+			if err != nil {
+				log.Printf("Error al ejecutar la función almacenada: %v", err)
+				return nil, errors.New("Error al obtener la configuración desde la base de datos")
+			}
+
+			if len(result) == 0 || len(result[0]) == 0 {
+				return nil, errors.New("No se obtuvo respuesta de la función almacenada")
+			}
+
+			jsonResponseStr, ok := result[0][0].(string)
+			if !ok {
+				log.Printf("Tipo de dato inesperado de la función almacenada: %T", result[0][0])
+				return nil, errors.New("Formato de respuesta inesperado de la función almacenada")
+			}
+
+			var configData comunes_entidades.ConfiguracionInicial // Asumiendo que ConfiguracionInicial puede mapear la respuesta
+			if err := json.Unmarshal([]byte(jsonResponseStr), &configData); err != nil {
+				log.Printf("Error al parsear la respuesta JSON de la función almacenada: %v", err)
+				return nil, errors.New("Error al parsear la respuesta JSON de la función almacenada")
+			}
+			return &configData, nil
+
 		} else if autoservicioMaestro != nil && autoservicioMaestro.Valor == "N" {
 			// SI “AUTOSERVICIO_MAESTRO” es “N” debe enviar una petición al POS MAESTRO
 			if autoservicioIPMaestro == nil || autoservicioIPMaestro.Valor == "" {
 				return nil, errors.New("AUTOSERVICIO_IP_MAESTRO no configurado para petición a POS MAESTRO")
 			}
-			url := autoservicioIPMaestro.Valor + "/configuracion"
+			url := autoservicioIPMaestro.Valor + constants.API_POS_MAESTRO
 			_, err := s.HTTPClient.Send(
 				"GET",
 				url,
