@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-type RecuperarPosPrincipal struct {
+type RecuperarParametrosPos struct {
 	Client domain_adapters_clients_db.IClientDB
 }
 
-func (RWP *RecuperarPosPrincipal) Consultar(codigo string) (*comunes_entidades.ParametrosWatcher, error) {
+func (RWP *RecuperarParametrosPos) Consultar(codigo string) (*comunes_entidades.ParametrosWatcher, error) {
 	args := []any{}
 	query := `SELECT x.* FROM public.wacher_parametros x WHERE codigo ilike $1`
 	query = strings.ReplaceAll(query, "$1", "'%"+codigo+"%'")
