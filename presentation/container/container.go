@@ -5,6 +5,7 @@ import (
 	aplication_services_configuracion_esclavo "genexis/pos/autoservicios/aplication/services/configuracion_esclavo"
 	aplication_usecases_configuracion "genexis/pos/autoservicios/aplication/usecases/configuracion"
 	aplication_usecases_configuracion_esclavo "genexis/pos/autoservicios/aplication/usecases/configuracion_esclavo"
+	infraestructura_repos_comunes "genexis/pos/autoservicios/infraestructure/db/repositories/comunes"
 	infraestructura_repos_configuracion "genexis/pos/autoservicios/infraestructure/db/repositories/configuracion"
 	infraestructura_repos_configuracion_esclavo "genexis/pos/autoservicios/infraestructure/db/repositories/configuracion_esclavo"
 
@@ -78,6 +79,9 @@ func InitializeContainer() error {
 	GetConfiguracionRepository := &infraestructura_repos_configuracion.ConfiguracionInicialRepository{
 		Client: clientDB,
 	}
+  RecuperarWatcherParametrosRepo := &infraestructura_repos_comunes.RecuperarParametrosPos{
+		Client: clientDB,
+	}
 	GetConfiguracionEsclavoRepository := &infraestructura_repos_configuracion_esclavo.ConfiguracionInicialEsclavoRepository{
 		Client: clientDB,
 	}
@@ -98,8 +102,9 @@ func InitializeContainer() error {
 		GetExampleUseCase: GetExampleUseCase,
 	}
 	GetConfiguracionInicialService = &aplication_services_configuracion.GetConfiguracionInicialService{
-		UseCase:    GetConfiguracionUseCase,
-		HTTPClient: clientHttp,
+		UseCase:       GetConfiguracionUseCase,
+		HTTPClient:    clientHttp,
+		ParametroRepo: RecuperarWatcherParametrosRepo,
 	}
 	GetConfiguracionInicialEsclavoService = &aplication_services_configuracion_esclavo.GetConfiguracionInicialEsclavoService{
 		UseCase:    GetConfiguracionEsclavoUseCase,

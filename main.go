@@ -24,7 +24,7 @@ func main() {
 		panic(err)
 	}
 
-	log.Println("--- INICIANDO SERVICIO AUTO SERVICE POS ---")
+	log.Println("--- INICIANDO AUTO SERVICE POS ---")
 	if err := api_adapter_servidor.Start(); err != nil {
 		log.Fatal(err)
 		panic(err)

@@ -13,8 +13,9 @@ type GetExampleRepository struct {
 
 func (GBPER *GetExampleRepository) Get(param int) (*[]entities_example.DataResponse, error) {
 
-	query := "SELECT * FROM scheme.function($1);"
-	results, err := GBPER.Client.Exec(query, []any{param})
+	query := "SELECT now();"
+	results, err := GBPER.Client.Exec(query, []any{})
+	log.Println("QUERY EXAMPLE", results)
 	if err != nil {
 		log.Println(err)
 		return nil, err

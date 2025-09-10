@@ -4,7 +4,6 @@ import (
 	domain_adapters_clients_db "genexis/pos/autoservicios/domain/adapters/clients/db"
 	comunes_entidades "genexis/pos/autoservicios/domain/entities/entidades_comunes"
 	"log"
-	"strings"
 )
 
 type RecuperarParametrosPos struct {
@@ -12,11 +11,9 @@ type RecuperarParametrosPos struct {
 }
 
 func (RWP *RecuperarParametrosPos) Consultar(codigo string) (*comunes_entidades.ParametrosWatcher, error) {
-	args := []any{}
-	query := `SELECT x.* FROM public.wacher_parametros x WHERE codigo ilike $1`
-	query = strings.ReplaceAll(query, "$1", "'%"+codigo+"%'")
-	log.Printf("CONSULTA PARAMETROS %s", query)
-	respuesta, err := RWP.Client.Select(query, args)
+	query := `SELECT x.* FROM public.wacher_parametros x WHERE codigo ilike '%'||$1||'%'`
+	respuesta, err := RWP.Client.Exec(query, []any{codigo})
+	log.Print("Respuesta: ", respuesta)
 
 	if err != nil {
 		return nil, err

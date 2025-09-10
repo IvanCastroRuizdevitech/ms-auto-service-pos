@@ -1,32 +1,40 @@
 package aplication_services_configuracion
 
 import (
-	aplication_usecases_configuracion "genexis/pos/autoservicios/aplication/usecases/configuracion"
-	"genexis/pos/autoservicios/domain/entities"
-	comunes_entidades "genexis/pos/autoservicios/domain/entities/entidades_comunes"
-	domain_adapters_clients_http "genexis/pos/autoservicios/domain/adapters/clients/http"
-	infrastructura_repositorios "genexis/pos/autoservicios/infraestructure/db/repositories/comunes"
 	"encoding/json"
 	"errors"
+	aplication_usecases_configuracion "genexis/pos/autoservicios/aplication/usecases/configuracion"
+	"genexis/pos/autoservicios/domain/constants"	
+	domain_adapters_clients_http "genexis/pos/autoservicios/domain/adapters/clients/http"
+	"genexis/pos/autoservicios/domain/entities"
+	comunes_entidades "genexis/pos/autoservicios/domain/entities/entidades_comunes"
+	infrastructura_repositorios "genexis/pos/autoservicios/infraestructure/db/repositories/comunes"
 	"genexis/pos/autoservicios/domain/constants"
 	"log"
 )
 
 type GetConfiguracionInicialService struct {
-	UseCase    *aplication_usecases_configuracion.GetConfiguracionInicialUseCase
-	HTTPClient domain_adapters_clients_http.IClientHttp
+	UseCase       *aplication_usecases_configuracion.GetConfiguracionInicialUseCase
+	HTTPClient    domain_adapters_clients_http.IClientHttp
 	ParametroRepo *infrastructura_repositorios.RecuperarParametrosPos
 }
 
 func (s *GetConfiguracionInicialService) Execute() (*comunes_entidades.ConfiguracionInicial, error) {
 
+	log.Printf("CONSULTANDO CONFIGURACION INICIAL")
 	// 1. Recuperar parámetros
-	autoservicioMaestro, err := s.ParametroRepo.Consultar("AUTOSERVICIO_MAESTRO")
-	if err != nil { return nil, err }
-	autoservicioIPMaestro, err := s.ParametroRepo.Consultar("AUTOSERVICIO_IP_MAESTRO")
-	if err != nil { return nil, err }
-	autoservicioPOS, err := s.ParametroRepo.Consultar("AUTOSERVICIO_POS")
-	if err != nil { return nil, err }
+	autoservicioMaestro, err := s.ParametroRepo.Consultar(constants.AUTOSERVICIO_MAESTRO)
+	if err != nil {
+		return nil, err
+	}
+	autoservicioIPMaestro, err := s.ParametroRepo.Consultar(constants.AUTOSERVICIO_IP_MAESTRO)
+	if err != nil {
+		return nil, err
+	}
+	autoservicioPOS, err := s.ParametroRepo.Consultar(constants.AUTOSERVICIO_POS)
+	if err != nil {
+		return nil, err
+	}
 
 	// 2. Lógica condicional
 	if autoservicioPOS != nil && autoservicioPOS.Valor == "S" {
@@ -66,6 +74,7 @@ func (s *GetConfiguracionInicialService) Execute() (*comunes_entidades.Configura
 				return nil, errors.New("AUTOSERVICIO_IP_MAESTRO no configurado para petición a POS MAESTRO")
 			}
 			url := autoservicioIPMaestro.Valor + ":" + constants.HOST_PORT + constants.API_PATH + constants.API_CONFIGURACION + constants.API_POS_MAESTRO
+
 			_, err := s.HTTPClient.Send(
 				"GET",
 				url,
@@ -93,5 +102,3 @@ func (s *GetConfiguracionInicialService) Execute() (*comunes_entidades.Configura
 
 	return s.UseCase.Execute()
 }
-
-
