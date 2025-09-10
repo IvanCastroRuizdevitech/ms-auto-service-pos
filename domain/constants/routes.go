@@ -1,11 +1,10 @@
 package constants
 
 const (
-	API_PATH string = "/api/v1/sat"
+	API_PATH string = "/api/v1"
 
 	API_EXAMPLE = "/example"
 
-	API_PRODUCTS = "/products"
+	API_CONFIGURACION = "/configuracion"
 
-	API_TANKS = "/tanks"
 )
