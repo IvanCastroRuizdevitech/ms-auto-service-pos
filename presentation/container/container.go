@@ -2,9 +2,12 @@ package container
 
 import (
 	aplication_services_configuracion "genexis/pos/autoservicios/aplication/services/configuracion"
+	aplication_services_configuracion_esclavo "genexis/pos/autoservicios/aplication/services/configuracion_esclavo"
 	aplication_usecases_configuracion "genexis/pos/autoservicios/aplication/usecases/configuracion"
+	aplication_usecases_configuracion_esclavo "genexis/pos/autoservicios/aplication/usecases/configuracion_esclavo"
 	infraestructura_repos_comunes "genexis/pos/autoservicios/infraestructure/db/repositories/comunes"
 	infraestructura_repos_configuracion "genexis/pos/autoservicios/infraestructure/db/repositories/configuracion"
+	infraestructura_repos_configuracion_esclavo "genexis/pos/autoservicios/infraestructure/db/repositories/configuracion_esclavo"
 
 	aplication_services_example "genexis/pos/autoservicios/aplication/services/example"
 	"genexis/pos/autoservicios/aplication/usecases/casosuso_comunes"
@@ -30,6 +33,7 @@ import (
 // SERVICES
 var GetExampleService *aplication_services_example.GetExampleService
 var GetConfiguracionInicialService *aplication_services_configuracion.GetConfiguracionInicialService
+var GetConfiguracionInicialEsclavoService *aplication_services_configuracion_esclavo.GetConfiguracionInicialEsclavoService
 
 // USE CASES
 var GetExampleUseCase domain_usecases_example.GetExampleUseCase
@@ -75,7 +79,10 @@ func InitializeContainer() error {
 	GetConfiguracionRepository := &infraestructura_repos_configuracion.ConfiguracionInicialRepository{
 		Client: clientDB,
 	}
-	RecuperarWatcherParametrosRepo := &infraestructura_repos_comunes.RecuperarParametrosPos{
+  RecuperarWatcherParametrosRepo := &infraestructura_repos_comunes.RecuperarParametrosPos{
+		Client: clientDB,
+	}
+	GetConfiguracionEsclavoRepository := &infraestructura_repos_configuracion_esclavo.ConfiguracionInicialEsclavoRepository{
 		Client: clientDB,
 	}
 
@@ -86,6 +93,9 @@ func InitializeContainer() error {
 	GetConfiguracionUseCase := &aplication_usecases_configuracion.GetConfiguracionInicialUseCase{
 		Repository: GetConfiguracionRepository,
 	}
+	GetConfiguracionEsclavoUseCase := &aplication_usecases_configuracion_esclavo.GetConfiguracionInicialEsclavoUseCase{
+		Repository: GetConfiguracionEsclavoRepository,
+	}
 
 	// SERVICES
 	GetExampleService = &aplication_services_example.GetExampleService{
@@ -95,6 +105,10 @@ func InitializeContainer() error {
 		UseCase:       GetConfiguracionUseCase,
 		HTTPClient:    clientHttp,
 		ParametroRepo: RecuperarWatcherParametrosRepo,
+	}
+	GetConfiguracionInicialEsclavoService = &aplication_services_configuracion_esclavo.GetConfiguracionInicialEsclavoService{
+		UseCase:    GetConfiguracionEsclavoUseCase,
+		HTTPClient: clientHttp,
 	}
 
 	return nil

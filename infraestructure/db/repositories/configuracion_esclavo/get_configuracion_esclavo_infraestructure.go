@@ -1,15 +1,15 @@
-package infraestructura_repos_configuracion
+package infraestructura_repos_configuracion_esclavo
 
 import (
 	domain_adapters_clients_db "genexis/pos/autoservicios/domain/adapters/clients/db"
 	comunes_entidades "genexis/pos/autoservicios/domain/entities/entidades_comunes"
 )
 
-type ConfiguracionInicialRepository struct {
+type ConfiguracionInicialEsclavoRepository struct {
 	Client domain_adapters_clients_db.IClientDB
 }
 
-func (r *ConfiguracionInicialRepository) ConsultarConfiguracion() (*comunes_entidades.ConfiguracionInicial, error) {
+func (r *ConfiguracionInicialEsclavoRepository) ConsultarConfiguracionEsclavo() (*comunes_entidades.ConfiguracionInicial, error) {
     query := "SELECT * FROM public.fnc_configuracion_inicial();"
     results, err := r.Client.Exec(query, []any{})
     if err != nil {

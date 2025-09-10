@@ -16,3 +16,4 @@ func GetConfiguracionInicialController(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, entities.NewSuccessServerResponse("Configuración obtenida", data))
 }
+
