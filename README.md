@@ -7,4 +7,4 @@ Servicio encargado de Gestionar los procesos del POS de Autoservicios.
 - Iniciar el proyecto con : air
 
 # Compilar
-- GOOS=linux GOARCH=amd64 go build -o ms-auto-service-pos
+- GOOS=linux GOARCH=arm64 go build -o ms-auto-service-pos main.go
