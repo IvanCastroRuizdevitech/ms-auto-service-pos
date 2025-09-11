@@ -14,6 +14,6 @@ func GetConfiguracionInicialController(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, entities.NewErrorServerResponse("Error al obtener configuración", err))
 		return
 	}
-	c.JSON(http.StatusOK, entities.NewSuccessServerResponse("Configuración obtenida", data))
+	c.JSON(http.StatusOK, data)
 }
 

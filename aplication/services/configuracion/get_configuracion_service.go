@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	aplication_usecases_configuracion "genexis/pos/autoservicios/aplication/usecases/configuracion"
-	"genexis/pos/autoservicios/domain/constants"	
 	domain_adapters_clients_http "genexis/pos/autoservicios/domain/adapters/clients/http"
+	"genexis/pos/autoservicios/domain/constants"
 	"genexis/pos/autoservicios/domain/entities"
 	comunes_entidades "genexis/pos/autoservicios/domain/entities/entidades_comunes"
 	infrastructura_repositorios "genexis/pos/autoservicios/infraestructure/db/repositories/comunes"
-	"genexis/pos/autoservicios/domain/constants"
 	"log"
 )
 
@@ -22,7 +21,6 @@ type GetConfiguracionInicialService struct {
 func (s *GetConfiguracionInicialService) Execute() (*comunes_entidades.ConfiguracionInicial, error) {
 
 	log.Printf("CONSULTANDO CONFIGURACION INICIAL")
-	// 1. Recuperar parámetros
 	autoservicioMaestro, err := s.ParametroRepo.Consultar(constants.AUTOSERVICIO_MAESTRO)
 	if err != nil {
 		return nil, err
@@ -35,70 +33,55 @@ func (s *GetConfiguracionInicialService) Execute() (*comunes_entidades.Configura
 	if err != nil {
 		return nil, err
 	}
+	autoservicioCARAS, err := s.ParametroRepo.Consultar(constants.AUTOSERVICIO_CARAS)
+	if err != nil {
+		return nil, err
+	}
 
-	// 2. Lógica condicional
 	if autoservicioPOS != nil && autoservicioPOS.Valor == "S" {
 		if autoservicioMaestro != nil && autoservicioMaestro.Valor == "S" {
-			// SI “AUTOSERVICIO_MAESTRO” es “S” hacer una petición a la base de datos
-			// Llamada a la función almacenada fnc_obtener_configuracion_pos_autoservicio
-			query := "SELECT * FROM public.fnc_obtener_configuracion_pos_autoservicio($1)"
-			// Se pasa un JSON vacío como parámetro ya que la función almacenada no lo utiliza actualmente
-			args := []interface{}{"{}"}
-
-			result, err := s.ParametroRepo.Client.Select(query, args)
-			if err != nil {
-				log.Printf("Error al ejecutar la función almacenada: %v", err)
-				return nil, errors.New("Error al obtener la configuración desde la base de datos")
+			caras := &comunes_entidades.ConfiguracionInicialEsclavo{
+				Caras: autoservicioCARAS.Valor,
 			}
-
-			if len(result) == 0 || len(result[0]) == 0 {
-				return nil, errors.New("No se obtuvo respuesta de la función almacenada")
-			}
-
-			jsonResponseStr, ok := result[0][0].(string)
-			if !ok {
-				log.Printf("Tipo de dato inesperado de la función almacenada: %T", result[0][0])
-				return nil, errors.New("Formato de respuesta inesperado de la función almacenada")
-			}
-
-			var configData comunes_entidades.ConfiguracionInicial // Asumiendo que ConfiguracionInicial puede mapear la respuesta
-			if err := json.Unmarshal([]byte(jsonResponseStr), &configData); err != nil {
-				log.Printf("Error al parsear la respuesta JSON de la función almacenada: %v", err)
-				return nil, errors.New("Error al parsear la respuesta JSON de la función almacenada")
-			}
-			return &configData, nil
-
+			log.Print("caras: ", caras)
+			return s.UseCase.Execute(caras)
 		} else if autoservicioMaestro != nil && autoservicioMaestro.Valor == "N" {
-			// SI “AUTOSERVICIO_MAESTRO” es “N” debe enviar una petición al POS MAESTRO
 			if autoservicioIPMaestro == nil || autoservicioIPMaestro.Valor == "" {
 				return nil, errors.New("AUTOSERVICIO_IP_MAESTRO no configurado para petición a POS MAESTRO")
 			}
-			url := autoservicioIPMaestro.Valor + ":" + constants.HOST_PORT + constants.API_PATH + constants.API_CONFIGURACION + constants.API_POS_MAESTRO
-
-			_, err := s.HTTPClient.Send(
-				"GET",
+			//url := autoservicioIPMaestro.Valor + ":" + constants.HOST_PORT + constants.API_PATH + constants.API_CONFIGURACION + constants.API_POS_MAESTRO
+			url := "localhost" + ":" + constants.HOST_PORT + constants.API_PATH + constants.API_CONFIGURACION + constants.API_POS_MAESTRO
+			bodyMarshal, _ := json.Marshal(comunes_entidades.ConfiguracionInicialEsclavo{Caras: autoservicioCARAS.Valor})
+			result, err := s.HTTPClient.Send(
+				"POST",
 				url,
-				&entities.HttpRequest{},
+				&entities.HttpRequest{
+					Body: bodyMarshal,
+				},
 			)
 			if err != nil {
 				return nil, err
 			}
+
+			var response *comunes_entidades.ConfiguracionInicial
+			err = json.Unmarshal(result.Body, &response)
+			if err != nil {
+				return nil, err
+			}
+			return response, err
 		} else {
 			return nil, errors.New("Valor de AUTOSERVICIO_MAESTRO no válido o no encontrado")
 		}
 	} else if autoservicioPOS != nil && autoservicioPOS.Valor == "N" {
-		// SI “AUTOSERVICIO_POS” es “N” No debe ejecutar ninguna acción y devolver un JSON
 		response := map[string]string{"mensaje": "El POS no es autoservicio"}
 		jsonResponse, err := json.Marshal(response)
 		if err != nil {
 			return nil, err
 		}
-		// Aquí se debería devolver el JSON como parte de la respuesta HTTP, no directamente desde el servicio.
-		// Para propósitos de demostración, se devuelve un error con el mensaje.
 		return nil, errors.New(string(jsonResponse))
 	} else {
 		return nil, errors.New("Valor de AUTOSERVICIO_POS no válido o no encontrado")
 	}
 
-	return s.UseCase.Execute()
+	//return s.UseCase.Execute()
 }

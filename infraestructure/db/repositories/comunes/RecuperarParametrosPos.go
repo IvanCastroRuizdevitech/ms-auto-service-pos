@@ -13,7 +13,6 @@ type RecuperarParametrosPos struct {
 func (RWP *RecuperarParametrosPos) Consultar(codigo string) (*comunes_entidades.ParametrosWatcher, error) {
 	query := `SELECT x.* FROM public.wacher_parametros x WHERE codigo ilike '%'||$1||'%'`
 	respuesta, err := RWP.Client.Exec(query, []any{codigo})
-	log.Print("Respuesta: ", respuesta)
 
 	if err != nil {
 		return nil, err
@@ -26,6 +25,7 @@ func (RWP *RecuperarParametrosPos) Consultar(codigo string) (*comunes_entidades.
 		parametro.Tipo = valor[2].(int32)
 		parametro.Valor = valor[3].(string)
 	}
-
+	log.Print("codigo: ", codigo)
+	log.Print("parametro: ", parametro.Valor)
 	return parametro, nil
 }

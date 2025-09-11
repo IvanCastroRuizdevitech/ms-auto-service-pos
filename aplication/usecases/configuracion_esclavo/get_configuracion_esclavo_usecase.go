@@ -9,6 +9,6 @@ type GetConfiguracionInicialEsclavoUseCase struct {
 	Repository domain_repositories_configuracion_esclavo.IConfiguracionInicialEsclavo
 }
 
-func (uc *GetConfiguracionInicialEsclavoUseCase) Execute() (*comunes_entidades.ConfiguracionInicial, error) {
-	return uc.Repository.ConsultarConfiguracionEsclavo()
+func (uc *GetConfiguracionInicialEsclavoUseCase) Execute(body *comunes_entidades.ConfiguracionInicialEsclavo) (*comunes_entidades.ConfiguracionInicial, error) {
+	return uc.Repository.ConsultarConfiguracionEsclavo(body)
 }

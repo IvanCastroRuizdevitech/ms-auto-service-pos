@@ -8,15 +8,19 @@ type ConfiguracionInicial struct {
 	Data    ConfiguracionData `json:"data"`
 }
 
+type ConfiguracionInicialEsclavo struct {
+	Caras string `json:"caras"`
+}
+
 type ConfiguracionData struct {
 	Surtidores         []Surtidor        `json:"surtidores"`
 	SurtidoresDetalles []SurtidorDetalle `json:"surtidores_detalles"`
-	Productos          []Producto        `json:"productos"`
-	FamiliasPrecios    []ProductoFamilia `json:"familias_precios"`
 	Empresas           []Empresa         `json:"empresas"`
-	Equipos            []Equipo          `json:"equipos"`
+	MediosPagos        []MedioPago       `json:"medios_pagos"`
+	Parametros         ParametrosConfi   `json:"parametros"`
 }
 
+type ParametrosConfi map[string]ParametroValor
 type Surtidor struct {
 	Id                            int64    `json:"id"`
 	Surtidor                      int32    `json:"surtidor"`
@@ -50,30 +54,36 @@ type Surtidor struct {
 }
 
 type SurtidorDetalle struct {
-	Id                            int64    `json:"id"`
-	SurtidoresId                  int64    `json:"surtidores_id"`
-	Surtidor                      int32    `json:"surtidor"`
-	Cara                          *int32   `json:"cara"`
-	Manguera                      int32    `json:"manguera"`
-	Grado                         *int32   `json:"grado"`
-	ProductosId                   int64    `json:"productos_id"`
-	AcumuladoVenta                *float64 `json:"acumulado_venta"`
-	AcumuladoCantidad             *float64 `json:"acumulado_cantidad"`
-	UltimaConexion                *string  `json:"ultima_conexion"`
-	LectorPuerto                  *int32   `json:"lector_puerto"`
-	SaltoLectura                  *string  `json:"salto_lectura"`
-	AcumuladoVentaSurt            *float64 `json:"acumulado_venta_surt"`
-	AcumuladoCantidadSurt         *float64 `json:"acumulado_cantidad_surt"`
-	Estado                        *int32   `json:"estado"`
-	EstadoPublico                 *int32   `json:"estado_publico"`
-	BodegasId                     *int64   `json:"bodegas_id"`
-	LectorRfid                    *string  `json:"lector_rfid"`
-	Bloqueo                       *string  `json:"bloqueo"`
-	MotivoBloqueo                 *string  `json:"motivo_bloqueo"`
-	Conexion                      *int32   `json:"conexion"`
-	Puerto                        *string  `json:"puerto"`
-	BytesTotalizador              *int32   `json:"bytes_totalizador"`
-	FactorPredeterminacionImporte int32    `json:"factor_predeterminacion_importe"`
+	Id                            int64            `json:"id"`
+	SurtidoresId                  int64            `json:"surtidores_id"`
+	Surtidor                      int32            `json:"surtidor"`
+	Cara                          *int32           `json:"cara"`
+	Manguera                      int32            `json:"manguera"`
+	Grado                         *int32           `json:"grado"`
+	ProductosId                   int64            `json:"productos_id"`
+	AcumuladoVenta                *float64         `json:"acumulado_venta"`
+	AcumuladoCantidad             *float64         `json:"acumulado_cantidad"`
+	UltimaConexion                *string          `json:"ultima_conexion"`
+	LectorPuerto                  *int32           `json:"lector_puerto"`
+	SaltoLectura                  *string          `json:"salto_lectura"`
+	AcumuladoVentaSurt            *float64         `json:"acumulado_venta_surt"`
+	AcumuladoCantidadSurt         *float64         `json:"acumulado_cantidad_surt"`
+	Estado                        *int32           `json:"estado"`
+	EstadoPublico                 *int32           `json:"estado_publico"`
+	BodegasId                     *int64           `json:"bodegas_id"`
+	LectorRfid                    *string          `json:"lector_rfid"`
+	Bloqueo                       *string          `json:"bloqueo"`
+	MotivoBloqueo                 *string          `json:"motivo_bloqueo"`
+	Conexion                      *int32           `json:"conexion"`
+	Puerto                        *string          `json:"puerto"`
+	BytesTotalizador              *int32           `json:"bytes_totalizador"`
+	FactorPredeterminacionImporte int32            `json:"factor_predeterminacion_importe"`
+	FamiliaId                     *int64           `json:"familia_id"`
+	FamiliaCodigo                 *string          `json:"familia_codigo"`
+	PrecioFamilia                 *float64         `json:"precio_familia"`
+	ProductoPrecio                *float64         `json:"producto_precio"`
+	ProductoDescripcion           *string          `json:"producto_descripcion"`
+	FamiliaAtributos              *json.RawMessage `json:"familia_atributos"`
 }
 
 type Producto struct {
@@ -157,4 +167,26 @@ type Equipo struct {
 	ImpresoraPort       *int32  `json:"impresora_port"`
 	UrlFoto             *string `json:"url_foto"`
 	Autorizado          string  `json:"autorizado"`
+}
+
+type MedioPago struct {
+	Id                             int64       `json:"id"`
+	Base64                         *string     `json:"base64"`
+	Estado                         string      `json:"estado"`
+	Descripcion                    string      `json:"descripcion"`
+	MpAtributos                    MpAtributos `json:"mp_atributos"`
+	IdSincronizado                 *int64      `json:"id_sincronizado"`
+	CodigoAdquiriente              *string     `json:"codigo_adquiriente"`
+	Base64Seleccionado             *string     `json:"base64_seleleccionado"`
+	IdMedioPagoRecurso             string      `json:"id_medio_pago_recurso"`
+	IdMedioPagoRecursoSeleccionado string      `json:"id_medio_pago_recurso_seleccionado"`
+}
+
+type MpAtributos struct {
+	Autoservicio bool `json:"autoservicio"`
+}
+
+type ParametroValor struct {
+	Tipo  int    `json:"tipo"`
+	Valor string `json:"valor"`
 }
